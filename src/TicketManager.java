@@ -1,17 +1,11 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
-/**
- * Created by RandyRyanEvan on 5/15/2016.
- */
 public class TicketManager {
-    static ArrayList<Ticket> tickets = new ArrayList<Ticket>();
-    String eventName;
+    private static ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+    private String eventName;
 
-    public TicketManager (String eventName) {
+    public TicketManager(String eventName) {
         this.eventName = eventName;
     }
 
@@ -22,18 +16,18 @@ public class TicketManager {
         manager.addTicket("Regular",1);
         manager.addTicket("Regular",10);
         manager.addTicket("Regular",1);
-        for (int i = 0; i < tickets.size(); i++) {
-            System.out.println(tickets.get(i).id);
+        for (Ticket ticket : tickets) {
+            System.out.println(ticket.id);
         }
-        ArrayList<String> limitTypes = new ArrayList<String>();
-        limitTypes.add("Regular");
+        ArrayList<String> limitTypes = new ArrayList<>();
+        //limitTypes.add("");
         manager.validateTickets(limitTypes);
     }
 
     public void addTicket(String type, int maxUses) {
         try {
             tickets.add(Ticket.createTicket(type, maxUses));
-        } catch(Error error) {
+        } catch(Error ignored) {
 
         }
     }
@@ -62,8 +56,8 @@ public class TicketManager {
                 } else {
                     if (limitTicketTypes.size() > 0) {
                         checkingTicketType = true;
-                        for (int i = 0; i < limitTicketTypes.size(); i++) {
-                            if (limitTicketTypes.get(i).equals(ticketToCheck.type)) {
+                        for (String limitTicketType : limitTicketTypes) {
+                            if (limitTicketType.equals(ticketToCheck.type)) {
                                 found = true;
                                 break;
                             }
@@ -86,7 +80,7 @@ public class TicketManager {
         }
     }
 
-    public Ticket findTicket (int id) {
+    private Ticket findTicket(int id) {
         boolean found = false;
         int ticketIndex = -1;
         for (int i = 0; i < tickets.size(); i++){

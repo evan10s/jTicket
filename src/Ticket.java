@@ -1,8 +1,5 @@
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Created by RandyRyanEvan on 5/15/2016.
- */
 public class Ticket {
     int id;
     String type;
