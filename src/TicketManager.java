@@ -151,7 +151,7 @@ public class TicketManager {
 
     public void printStats() {
         System.out.println("Statistics for event " + this.eventName);
-        System.out.println("Total tickets checked " + this.totalTicketsChecked);
+        System.out.println("Total tickets checked: " + this.totalTicketsChecked);
         System.out.println("Valid entrances: " + this.validEntries);
         System.out.println("EntryRestrict blocks: " + this.entryRestrictErrors);
         System.out.println("  Wrong entrance: " + this.entryRestrictWrongEntrances);
