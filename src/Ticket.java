@@ -22,7 +22,7 @@ public class Ticket {
     * Create a new ticket
     * @param type The type of ticket to create
     * @param maxUses The maximum number of times this ticket can be used; must be at least 1
-    * @return True if ticket creation was successful, false if not
+    * @return A new Ticket
      */
     public static Ticket createTicket(String type, int maxUses, int validationCode) throws IllegalArgumentException {
         if (maxUses < 1) { //if the maxUses parameter is less than 0, throw an exception
@@ -48,5 +48,12 @@ public class Ticket {
             }
             return "already redeemed";
         }
+    }
+
+    /*
+    * Reset the number of times this ticket has been used to 0
+     */
+    public void resetTicket() {
+        this.uses = 0;
     }
 }

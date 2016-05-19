@@ -1,8 +1,11 @@
+import com.sun.istack.internal.Nullable;
+
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TicketManager {
-    private static ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+    public ArrayList<Ticket> tickets = new ArrayList<Ticket>();
     private String eventName;
     private int entryRestrictErrors = 0;
     private int totalTicketsChecked = 0;
@@ -17,36 +20,79 @@ public class TicketManager {
         this.eventName = eventName;
     }
 
-    public static void main (String[] args) {
-        TicketManager manager = new TicketManager("WES 2016");
-        manager.addTickets("Regular",1,10,0);
-        manager.addTickets("Regular - Group",10, 5,0);
-        manager.addTickets("Premium",1,5,1234);
-        manager.addTickets("VIP",1,3,12345);
-        manager.addTickets("Premium - Group",15,2,0);
-        for (Ticket ticket : tickets) {
-            System.out.println("Ticket " + ticket.id + " valid for " + ticket.maxUses + " " + ticket.type + " entrance(s)");
+    private void addTicketCommandLine() {
+        System.out.println("Enter ticket type");
+        Scanner userInput = new Scanner(System.in);
+        String ticketType,
+               ticketVCAnswer;
+        int ticketUses,
+            numTickets;
+        boolean ticketVC;
+        while (!userInput.hasNext()) {
+            userInput.next();
         }
-        ArrayList<String> limitTypes = new ArrayList<>();
-        limitTypes.add("VIP");
-        manager.validateTickets(limitTypes);
-        limitTypes.clear();
-        limitTypes.add("Regular - Group");
-        limitTypes.add("Premium - Group");
-        manager.validateTickets(limitTypes);
-        limitTypes.clear();
-        limitTypes.add("Premium");
-        manager.validateTickets(limitTypes);
-        limitTypes.clear();
-        manager.validateTickets(limitTypes);
-        manager.printStats();
+        ticketType = userInput.next();
+
+        System.out.println("Number of tickets:");
+        while (!userInput.hasNext()) {
+            userInput.next();
+        }
+        numTickets = userInput.nextInt();
+
+        System.out.println("Number of uses allowed per ticket:");
+        while (!userInput.hasNext()) {
+            userInput.next();
+        }
+        ticketUses = userInput.nextInt();
+
+        System.out.println("Require PIN to redeem these tickets?  y/n");
+        while (!userInput.hasNext()) {
+            userInput.next();
+        }
+        ticketVCAnswer = userInput.next();
+        ticketVC = ticketVCAnswer.equals("y");
+
+        addTickets(ticketType,ticketUses,numTickets,ticketVC);
+
+    }
+
+    public void functionManager() {
+        System.out.println("Welcome to jTicket v0.1-beta");
+        Scanner functionGetter = new Scanner(System.in);
+        String functionRequested = "";
+        ArrayList<String> limitTicketTypes = new ArrayList<>();
+        while(!functionRequested.equals("quit")) {
+            System.out.println("Enter function name to continue or quit to exit");
+            while (!functionGetter.hasNext()) {
+                functionGetter.next();
+            }
+            functionRequested = functionGetter.next();
+            switch (functionRequested) {
+                case "create":
+                    addTicketCommandLine();
+                    break;
+                case "validate":
+                    validateTickets(limitTicketTypes);
+                    break;
+                case "print":
+                    printTickets();
+                    break;
+            }
+        }
     }
 
     /*
     *
     * @param validationCode Code required to redeem this ticket; enter a number >= 1000 to use or 0 to ignore
      */
-    public void addTicket(String type, int maxUses, int validationCode) {
+    public void addTicket(String type, int maxUses, boolean useValidationCode) {
+        int validationCode;
+        if (useValidationCode) {
+            validationCode = ThreadLocalRandom.current().nextInt(1000,9999);
+        } else {
+            validationCode = 0;
+        }
+
         try {
             tickets.add(Ticket.createTicket(type, maxUses, validationCode));
         } catch(Error ignored) {
@@ -54,7 +100,7 @@ public class TicketManager {
         }
     }
 
-    public void addTickets(String type, int maxUses, int number, int validationCode) {
+    public void addTickets(String type, int maxUses, int number, boolean validationCode) {
         for (int i = 0; i < number; i++) {
             addTicket(type, maxUses, validationCode);
         }
@@ -70,8 +116,9 @@ public class TicketManager {
         return codeScanner.nextInt();
     }
 
-    public void validateTickets(ArrayList<String> limitTicketTypes) {
+    private void validateTickets(ArrayList<String> limitTicketTypes) {
         System.out.println("jTicket v0.1-beta");
+        System.out.println(this.eventName);
         if (limitTicketTypes.size() > 0) {
             System.out.println("Entrance at this gate is restricted to " + limitTicketTypes.toString());
         }
@@ -158,6 +205,16 @@ public class TicketManager {
         System.out.println("  Incorrect validation code: " + this.entryRestrictWrongVCs + " (of " + this.validationCodesRequested + " requested)");
         System.out.println("Invalid ticket IDs: " + this.notFoundTickets);
         System.out.println("Attempted excessive redemptions: " + this.alreadyRedeemed);
+    }
+
+    private void printTickets() {
+        for (Ticket ticket : tickets) {
+            if (ticket.validationCode >= 1000) {
+                System.out.println("Ticket " + ticket.id + " valid for " + ticket.maxUses + " " + ticket.type + " entrance(s) with PIN " + ticket.validationCode);
+            } else {
+                System.out.println("Ticket " + ticket.id + " valid for " + ticket.maxUses + " " + ticket.type + " entrance(s)");
+            }
+        }
     }
 
     private Ticket findTicket(int id) {
