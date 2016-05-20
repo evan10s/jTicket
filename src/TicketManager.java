@@ -56,6 +56,12 @@ public class TicketManager {
 
     }
 
+    private void makeCSV() {
+        for (Ticket ticket : tickets) {
+            System.out.println(ticket.id + "," + ticket.validationCode + "," + ticket.type + "," + ticket.maxUses);
+        }
+    }
+
     public void functionManager() {
         System.out.println("Welcome to jTicket v0.1-beta");
         Scanner functionGetter = new Scanner(System.in);
@@ -73,6 +79,9 @@ public class TicketManager {
                     break;
                 case "validate":
                     validateTickets(limitTicketTypes);
+                    break;
+                case "csv":
+                    makeCSV();
                     break;
                 case "print":
                     printTickets();
